@@ -8,6 +8,7 @@ Dla n kard o wartościach od 1 do n potrzebujemy n bitów.
 ## TODO
 * (1+1)
 * (μ+λ)
+* klasyczny algorytm?
 * różne strategie do obu algorytmów
 * sposób testowania
 * ...
