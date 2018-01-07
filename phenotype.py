@@ -24,7 +24,7 @@ class Phenotype:
 		self.standard_deviation = 1.0
 
 	def __str__(self):
-		st = "===Genotype===\n"
+		st = "\n===Genotype===\n"
 		s = "".join([str(x) for x in self.genotype])
         	s = (st + "Genotype: " + s + " Fitness: " + str(self.fitness) + " Influence: " + str(self.influence))
 		self.group_a = []
@@ -77,6 +77,7 @@ class Phenotype:
 		self.genotype[index] ^= 1
 
 	def crossover(self, other, method):
+		print method
 		if method == "single-point":
 			position = random.randint(1, len(self.genotype) - 1)
 			children_a = []
@@ -90,8 +91,8 @@ class Phenotype:
 					children_a.append(other.genotype[x])
 	
 			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
-		elif method == "two-piont":
-			position = sorted(random.sample( range( 1, len( self.genotype ) -2 ), 2)))
+		elif method == "two-point":
+			position = sorted(random.sample( range( 1, len( self.genotype ) -2 ), 2))
 			children_a = []
 			children_b = []
 			for x in range( len( self.genotype ) ):
@@ -105,7 +106,9 @@ class Phenotype:
 					children_a.append(self.genotype[x])
 					children_b.append(other.genotype[x])
 			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
-		elif == "uniform":
+		elif method == "uniform":
+			children_a = []
+			children_b = []
 			for x in range( len( self.genotype ) ):
 				rand = random.randint(0, 1)
 				if rand == 0:

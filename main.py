@@ -4,9 +4,11 @@ import sys
 import random
 import phenotype
 
-NUMBER_OF_CARDS = 15
+NUMBER_OF_CARDS = 10
 SUM_A = 20
 SUM_B = 100
+CROSSOVER_PROPABILITY = 0.7
+MUTATION_PROBABILITY = 0.02
 
 class Generation():
 	def __init__(self, number_of_individuals):
@@ -18,7 +20,7 @@ class Generation():
 
 	def __str__(self):
 		s = "\n".join([str(x) for x in self.population])
-		s = "\n\n************Population: **************\n" + s + "\n\n"
+		s = "\n************Population: **************" + s + "\n"
 		return s
 
 	def calc_fitness(self):
@@ -40,20 +42,17 @@ class Generation():
 
 		self.population.sort(key=lambda x: x.get_influence(), reverse=True)
 
-	def mutation(self):
-		i = 0
-		while i < self.number_of_individuals * 0.1:
-			self.population[random.randint(0, len(self.population) - 1)].mutation()
-			i += 1
-
-	def get_best(self):
+	def sort(self):
 		for individual in self.population:
 			individual.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 		self.population.sort(key=lambda x: x.get_fitness(), reverse=False)
+
+	def get_best(self):
+		self.sort()
 		return self.population[0]
 
 	def get_worst(self):
-		self.get_best()
+		self.sort()
 		return self.population[-1]
 
 	def get_avg_fitness(self):
@@ -64,31 +63,21 @@ class Generation():
 
 		return float(fitness_sum) / float(self.number_of_individuals)
 
-	def step(self):
-		i = 0
-		while (i < self.population[0].get_fitness() * self.number_of_individuals * 10 and i < (len(self.population) - 1)):
-			#self.population[random.randint(0, self.number_of_individuals - 1)].mutation(0.5, self.bit_probability_table)
-			i += 1
 
-		# Crossovers
-		i = 0
-		while (i < 10 * self.population[0].get_fitness() and i < (len(self.population) - 1)):
-			one = self.population[i]
-			i += 1
-			second = self.population[i]
-			i += 1
-			r = one.crossover(second)
-			#r['a'].mutation(0.01, self.bit_probability_table)
-			#r['b'].mutation(0.01, self.bit_probability_table)
-			self.population.append(r['a'])
-			self.population.append(r['b'])
+	def RouletteSelection(self,crossover_method):
+		parents = []
+		self.sort()
+		for i in range(self.lambd):
+		# roll dice
+			dice = random.random()
+			for agent in self.population:
+				dice -= agent.get_influence()
+				if dice <= 0:
+					parents.append(agent)
+					break
 
-		self.get_best()
-		# Get rid of half of the population
-		self.population = self.population[0:self.number_of_individuals]
-		self.num_iterations += 1
-		assert (len(self.population) == self.number_of_individuals)
-
+		return parents
+	
 class OnePlusOneStrategy(Generation, object):
 
 	def __init__(self):
@@ -109,45 +98,44 @@ class OnePlusOneStrategy(Generation, object):
 
 class MiPlusLambdaStrategy(Generation, object):
 
-	def __init__(self, mi, lambd, selection_method):
+	def __init__(self, mi, lambd, selection_method, crossover_method):
 		if mi > lambd:
 			raise RuntimeError('Bad argument! mi cannot be greater than lambda!')
 		super(MiPlusLambdaStrategy, self).__init__(mi)
 		self.mi = mi
 		self.lambd = lambd
-		self.max_iterations = 100
+		self.max_iterations = 1
 		self.calc_fitness()
 		self.selection_method = selection_method
+		self.crossover_method = crossover_method
 
 	def step(self):
 		self.num_iterations += 1
 		self.calc_fitness()
+		self.sort()
 		T = []
-		i = 0
+		if self.selection_method == "RouletteSelection":
+			T = self.RouletteSelection(self.crossover_method)
+
 
 def main(argv):
 	g = OnePlusOneStrategy()
-	print " 1 + 1 Strategy\n:"
+	print "1 + 1 Strategy:\nBefore:"
 	print g
-	print g.num_iterations
 	while g.num_iterations < g.max_iterations:
 		if g.population[0].fitness == 0:
 			break
 		g.step()
-	print g
-	print g.num_iterations
+	print "After:",g.num_iterations, "iterations:\n",g
 
-	print " mi plus lambda strategy:\n"
-	h = MiPlusLambdaStrategy(5, 10, "RouletteSelection")
+	print "\nmi plus lambda Strategy:\nBefone:"
+	h = MiPlusLambdaStrategy(8, 10, "RouletteSelection", "single-point")
 	print h
-	print h.num_iterations
 	while h.num_iterations < h.max_iterations:
 		if h.get_best().fitness == 0:
 			break
 		h.step()
-	print h
-	print h.num_iterations
-
+	print "After:",h.num_iterations, "iterations:\n", h
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
