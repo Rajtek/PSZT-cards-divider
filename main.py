@@ -107,15 +107,15 @@ class OnePlusOneStrategy(Generation, object):
 			self.population[0].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 
 
-class NiPlusLambdaStrategy(Generation, object):
+class MiPlusLambdaStrategy(Generation, object):
 
-	def __init__(self, ni, lambd, selection_method):
-		if ni > lambd:
-			raise RuntimeError('Bad argument! ni cannot be greater than lambda!')
-		super(NiPlusLambdaStrategy, self).__init__(ni)
-		self.ni = ni
+	def __init__(self, mi, lambd, selection_method):
+		if mi > lambd:
+			raise RuntimeError('Bad argument! mi cannot be greater than lambda!')
+		super(MiPlusLambdaStrategy, self).__init__(mi)
+		self.mi = mi
 		self.lambd = lambd
-		self.max_iterations = 15
+		self.max_iterations = 100
 		self.calc_fitness()
 		self.selection_method = selection_method
 
@@ -137,8 +137,8 @@ def main(argv):
 	print g
 	print g.num_iterations
 
-	print " ni plus lambda strategy:\n"
-	h = NiPlusLambdaStrategy(5, 10, "RouletteSelection")
+	print " mi plus lambda strategy:\n"
+	h = MiPlusLambdaStrategy(5, 10, "RouletteSelection")
 	print h
 	print h.num_iterations
 	while h.num_iterations < h.max_iterations:
