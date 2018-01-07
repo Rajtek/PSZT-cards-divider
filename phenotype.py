@@ -76,20 +76,45 @@ class Phenotype:
 	def mutate(self, index):
 		self.genotype[index] ^= 1
 
-	def crossover(self, other):
-		position = random.randint(1, len(self.genotype) - 1)
-		children_a = []
-		children_b = []
-		for x in range(len(self.genotype)):
-			if x < position:
-				children_a.append(self.genotype[x])
-				children_b.append(other.genotype[x])
-			else:
-				children_b.append(self.genotype[x])
-				children_a.append(other.genotype[x])
-
-		return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
-
+	def crossover(self, other, method):
+		if method == "single-point":
+			position = random.randint(1, len(self.genotype) - 1)
+			children_a = []
+			children_b = []
+			for x in range(len(self.genotype)):
+				if x < position:
+					children_a.append(self.genotype[x])
+					children_b.append(other.genotype[x])
+				else:
+					children_b.append(self.genotype[x])
+					children_a.append(other.genotype[x])
+	
+			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
+		elif method == "two-piont":
+			position = sorted(random.sample( range( 1, len( self.genotype ) -2 ), 2)))
+			children_a = []
+			children_b = []
+			for x in range( len( self.genotype ) ):
+				if x < position[0]:
+					children_a.append(self.genotype[x])
+					children_b.append(other.genotype[x])
+				elif x >= position[0] and x < position[1]:
+					children_b.append(self.genotype[x])
+					children_a.append(other.genotype[x])
+				elif x >= position[1]:
+					children_a.append(self.genotype[x])
+					children_b.append(other.genotype[x])
+			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
+		elif == "uniform":
+			for x in range( len( self.genotype ) ):
+				rand = random.randint(0, 1)
+				if rand == 0:
+					children_a.append(self.genotype[x])
+					children_b.append(other.genotype[x])
+				else:
+					children_b.append(self.genotype[x])
+					children_a.append(other.genotype[x])
+			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
 	def calc_fitness_function(self, A, B):
 		s = 0
 		i = 0
