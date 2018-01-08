@@ -223,20 +223,20 @@ def main(argv):
 	print "After:",g.num_iterations, "iterations:\n",g
 
 	
-	print "\nmi plus lambda Strategy:\nBefore:"
+	print "\nmi plus lambda Strategy:\nBest before:\n" 
 	h = MiPlusLambdaStrategy(100, 400, "RouletteSelection","single-point")
 	while h.get_best().fitness == 0:
 		h = MiPlusLambdaStrategy(100, 400, "RouletteSelection","single-point")
 
-	#print h
+	print h.get_best()
 	while h.num_iterations < h.max_iterations:
 
 		if h.get_best().fitness == 0:
 			break
 		h.step()
 
-	#print h
-	print "Best after:",h.num_iterations, "iterations:\n", h.get_best()
+	
+	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
 
 
 	
