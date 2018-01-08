@@ -5,9 +5,9 @@ import random
 import phenotype
 import math
 
-NUMBER_OF_CARDS = 15
-SUM_A = 20
-SUM_B = 100
+NUMBER_OF_CARDS = 50
+SUM_A = 320
+SUM_B = 955
 CROSSOVER_PROBABILITY = 0.7
 MUTATION_PROBABILITY = 0.02
 
@@ -107,15 +107,12 @@ class Generation():
 		# roll dice
 		
 			pick = random.uniform(0, 1)
-			current=0
 			for agent in self.population:
-				current += agent.get_influence()
+				pick -= agent.get_influence()
 
-				if current >= pick:
-
+				if pick < 0:
 					chosen.append(agent)
 					break
-
 		return chosen
 		
 	
@@ -147,7 +144,7 @@ class MiPlusLambdaStrategy(Generation, object):
 		self.mi = mi
 		self.lambd = lambd
 
-		self.max_iterations = 20
+		self.max_iterations = 30
 		self.calc_fitness()
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
@@ -155,12 +152,11 @@ class MiPlusLambdaStrategy(Generation, object):
 
 	def step(self):
 
-		print self.num_iterations , ": average fitness" , self.get_avg_fitness()
+		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "najlepszy:", self.get_best().get_fitness()
 
 		self.num_iterations += 1
 
-		parents=self.population[:self.lambd] #choose lambda of parents  #actually that works better than
-		#parents=self.RouletteSelection(self.lambd)
+		parents = self.RouletteSelection(self.lambd)
 		
 		#make children
 		list_of_indices = list(range(self.number_of_individuals))
@@ -170,7 +166,6 @@ class MiPlusLambdaStrategy(Generation, object):
 			del list_of_indices[first]
 			second = random.randint(0, len(list_of_indices) - 1)
 			del list_of_indices[second]
-
 			first_parent = parents[first]
 			second_parent = parents[second]
 			index = random.randint(0, NUMBER_OF_CARDS-1)
@@ -183,33 +178,18 @@ class MiPlusLambdaStrategy(Generation, object):
 			child['a'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 			child['b'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 
-			selector = []
-			selector.append(first_parent)
-			selector.append(second_parent)
-			selector.append(child['a'])
-			selector.append(child['b'])
-			selector.sort(key=lambda x: x.get_fitness(), reverse=True)
-
-			children.append(selector[0])
-			children.append(selector[1])
-
+			children.append(child['a'])
+			children.append(child['b'])
+			
 		
+
 		#add children to population
 		for x in children:
 			self.population.append(x)
-			self.number_of_individuals+=1
-		
-		#choose next population
-		
-		
-		next_population=self.RouletteSelection(self.mi)
-		
-		self.number_of_individuals=self.mi
-		self.population=next_population
-		
 
-
-
+		self.sort()
+		self.population = self.population[0:self.number_of_individuals]
+		
 
 def main(argv):
 	g = OnePlusOneStrategy()
@@ -224,18 +204,17 @@ def main(argv):
 
 	
 	print "\nmi plus lambda Strategy:\nBest before:\n" 
-	h = MiPlusLambdaStrategy(100, 400, "RouletteSelection","single-point")
+	h = MiPlusLambdaStrategy(4, 6, "RouletteSelection","single-point")
 	while h.get_best().fitness == 0:
-		h = MiPlusLambdaStrategy(100, 400, "RouletteSelection","single-point")
+		h = MiPlusLambdaStrategy(4, 6, "RouletteSelection","single-point")
 
-	print h.get_best()
+	#print h.get_best()
 	while h.num_iterations < h.max_iterations:
 
 		if h.get_best().fitness == 0:
 			break
 		h.step()
 
-	
 	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
 
 
