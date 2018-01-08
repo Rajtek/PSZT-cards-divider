@@ -88,7 +88,7 @@ class OnePlusOneStrategy(Generation, object):
 
 	def __init__(self):
 		super(OnePlusOneStrategy, self).__init__(1)
-		self.max_iterations = 15
+		self.max_iterations = MAX_ITERATIONS
 		self.calc_fitness()
 		
 
