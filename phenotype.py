@@ -1,9 +1,24 @@
 #!/usr/bin/python2.7
+# -*- coding: utf-8 -*-
+
+"""
+This is the module of phenotype representing cards
+"""
+
 
 import random
 
+
 class Phenotype:
+	"""
+	Class implementing all needed functionality with phenotype
+	"""
+	
 	def __init__(self, **kwargs):
+		"""
+		Constructor wich needs as a parameter 
+		genotype or size of new phenotype
+		"""
 		if "genotype" in kwargs.keys():
 			if type(kwargs["genotype"]) != list:
 				raise RuntimeError('Bad argument "genotype". Must be list')
@@ -12,8 +27,9 @@ class Phenotype:
 					raise RuntimeError('Bad "argument" genotype. ' "Not a binary list")
 			self.genotype = kwargs["genotype"]
 		elif "size" in kwargs.keys():
-			if type(kwargs["size"]) != int:
-				raise RuntimeError('Bad argument "size". Must be int')
+			if type(kwargs["size"]) != int or kwargs["size"] < 1:
+				print kwargs["size"]
+				raise RuntimeError('Bad argument "size". Must be int>0')
 			self.genotype = [random.randint(0, 1) for x in range(kwargs["size"])]
 		else:
 			raise RuntimeError("Bad arguments")
@@ -21,7 +37,6 @@ class Phenotype:
 		# that ones will be compute later
 		self.fitness = 0.0
 		self.influence = 0.0
-		self.standard_deviation = 1.0
 
 	def __str__(self):
 		st = "\n===Genotype===\n"
@@ -76,7 +91,7 @@ class Phenotype:
 	def mutate(self, index):
 		self.genotype[index] ^= 1
 
-	def crossover(self, other, method):
+	def crossover(self, other, method="single-point"):
 
 		if method == "single-point":
 			position = random.randint(1, len(self.genotype) - 1)
@@ -118,6 +133,8 @@ class Phenotype:
 					children_b.append(self.genotype[x])
 					children_a.append(other.genotype[x])
 			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
+		else:
+			return None
 	def calc_fitness_function(self, A, B):
 		s = 0
 		i = 0
