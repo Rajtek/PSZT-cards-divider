@@ -77,7 +77,7 @@ class Phenotype:
 		self.genotype[index] ^= 1
 
 	def crossover(self, other, method):
-		print method
+
 		if method == "single-point":
 			position = random.randint(1, len(self.genotype) - 1)
 			children_a = []

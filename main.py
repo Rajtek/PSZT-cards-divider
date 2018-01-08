@@ -5,10 +5,10 @@ import random
 import phenotype
 import math
 
-NUMBER_OF_CARDS = 10
+NUMBER_OF_CARDS = 15
 SUM_A = 20
 SUM_B = 100
-CROSSOVER_PROPABILITY = 0.7
+CROSSOVER_PROBABILITY = 0.7
 MUTATION_PROBABILITY = 0.02
 
 class Generation():
@@ -43,15 +43,14 @@ class Generation():
 
 		self.population.sort(key=lambda x: x.get_influence(), reverse=True)
 
-<<<<<<< HEAD
+
 	def mutation(self):
 		i = 0
 		while i < self.number_of_individuals * 0.1:
 			self.population[random.randint(0, len(self.population) - 1)].mutation()
 			i += 1
 
-=======
->>>>>>> 4d75b3b6b7213289b4f3c055b06091244a777cda
+
 	def sort(self):
 		for individual in self.population:
 			individual.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
@@ -73,7 +72,7 @@ class Generation():
 
 		return float(fitness_sum) / float(self.number_of_individuals)
 
-<<<<<<< HEAD
+
 	def step(self):
 		i = 0
 		while (i < self.population[0].get_fitness() * self.number_of_individuals * 10 and i < (len(self.population) - 1)):
@@ -112,29 +111,13 @@ class Generation():
 			for agent in self.population:
 				current += agent.get_influence()
 
-				if current > pick:
+				if current >= pick:
 
 					chosen.append(agent)
 					break
 
 		return chosen
 		
-=======
->>>>>>> 4d75b3b6b7213289b4f3c055b06091244a777cda
-
-	def RouletteSelection(self,crossover_method):
-		parents = []
-		self.sort()
-		for i in range(self.lambd):
-		# roll dice
-			dice = random.random()
-			for agent in self.population:
-				dice -= agent.get_influence()
-				if dice <= 0:
-					parents.append(agent)
-					break
-
-		return parents
 	
 class OnePlusOneStrategy(Generation, object):
 
@@ -163,29 +146,19 @@ class MiPlusLambdaStrategy(Generation, object):
 		super(MiPlusLambdaStrategy, self).__init__(mi)
 		self.mi = mi
 		self.lambd = lambd
-<<<<<<< HEAD
+
 		self.max_iterations = 20
-		self.calc_fitness()
-		self.selection_method = selection_method
-		
-=======
-		self.max_iterations = 1
 		self.calc_fitness()
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
 
->>>>>>> 4d75b3b6b7213289b4f3c055b06091244a777cda
+
 	def step(self):
 
 		print self.num_iterations , ": average fitness" , self.get_avg_fitness()
 
 		self.num_iterations += 1
-<<<<<<< HEAD
 
-		
-		
-		
-		
 		parents=self.population[:self.lambd] #choose lambda of parents  #actually that works better than
 		#parents=self.RouletteSelection(self.lambd)
 		
@@ -202,7 +175,7 @@ class MiPlusLambdaStrategy(Generation, object):
 			second_parent = parents[second]
 			index = random.randint(0, NUMBER_OF_CARDS-1)
 		
-			child = first_parent.crossover(second_parent,"single-point")
+			child = first_parent.crossover(second_parent,self.crossover_method)
 			child['a'].mutate(index)
 			child['b'].mutate(index)
 			first_parent.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
@@ -234,14 +207,9 @@ class MiPlusLambdaStrategy(Generation, object):
 		self.number_of_individuals=self.mi
 		self.population=next_population
 		
-=======
-		self.calc_fitness()
-		self.sort()
-		T = []
-		if self.selection_method == "RouletteSelection":
-			T = self.RouletteSelection(self.crossover_method)
 
->>>>>>> 4d75b3b6b7213289b4f3c055b06091244a777cda
+
+
 
 def main(argv):
 	g = OnePlusOneStrategy()
@@ -254,29 +222,25 @@ def main(argv):
 		g.step()
 	print "After:",g.num_iterations, "iterations:\n",g
 
-<<<<<<< HEAD
-	print " mi plus lambda strategy:\n"
-	h = MiPlusLambdaStrategy(100, 400, "RouletteSelection")
-	while h.get_best().fitness == 0:
-		h = MiPlusLambdaStrategy(100, 400, "RouletteSelection")
 	
-=======
-	print "\nmi plus lambda Strategy:\nBefone:"
-	h = MiPlusLambdaStrategy(8, 10, "RouletteSelection", "single-point")
->>>>>>> 4d75b3b6b7213289b4f3c055b06091244a777cda
-	print h
+	print "\nmi plus lambda Strategy:\nBefore:"
+	h = MiPlusLambdaStrategy(100, 400, "RouletteSelection","single-point")
+	while h.get_best().fitness == 0:
+		h = MiPlusLambdaStrategy(100, 400, "RouletteSelection","single-point")
+
+	#print h
 	while h.num_iterations < h.max_iterations:
 
 		if h.get_best().fitness == 0:
 			break
 		h.step()
-<<<<<<< HEAD
+
 	#print h
-	print h.num_iterations
-	print h.get_best()
-=======
-	print "After:",h.num_iterations, "iterations:\n", h
->>>>>>> 4d75b3b6b7213289b4f3c055b06091244a777cda
+	print "Best after:",h.num_iterations, "iterations:\n", h.get_best()
+
+
+	
+
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
