@@ -77,10 +77,10 @@ def main(argv):
 	# Parser
 	parser = argparse.ArgumentParser()
 	#parser.add_argument("-i", "--input", help="bla bla bla", type=str, required=True)
-    args = vars(parser.parse_args())
+	args = vars(parser.parse_args())
 
-    # find solution
-    find_solution()
+	# find solution
+	find_solution()
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
