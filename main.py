@@ -8,8 +8,9 @@ import math
 NUMBER_OF_CARDS = 50
 SUM_A = 320
 SUM_B = 955
-CROSSOVER_PROBABILITY = 0.7
-MUTATION_PROBABILITY = 0.02
+CROSSOVER_PROBABILITY = 0.8
+MUTATION_PROBABILITY = 0.03
+MAX_ITERATIONS = 30
 
 class Generation():
 	def __init__(self, number_of_individuals):
@@ -43,14 +44,6 @@ class Generation():
 
 		self.population.sort(key=lambda x: x.get_influence(), reverse=True)
 
-
-	def mutation(self):
-		i = 0
-		while i < self.number_of_individuals * 0.1:
-			self.population[random.randint(0, len(self.population) - 1)].mutation()
-			i += 1
-
-
 	def sort(self):
 		for individual in self.population:
 			individual.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
@@ -72,31 +65,6 @@ class Generation():
 
 		return float(fitness_sum) / float(self.number_of_individuals)
 
-
-	def step(self):
-		i = 0
-		while (i < self.population[0].get_fitness() * self.number_of_individuals * 10 and i < (len(self.population) - 1)):
-			#self.population[random.randint(0, self.number_of_individuals - 1)].mutation(0.5, self.bit_probability_table)
-			i += 1
-
-		# Crossovers
-		i = 0
-		while (i < 10 * self.population[0].get_fitness() and i < (len(self.population) - 1)):
-			one = self.population[i]
-			i += 1
-			second = self.population[i]
-			i += 1
-			r = one.crossover(second)
-			#r['a'].mutation(0.01, self.bit_probability_table)
-			#r['b'].mutation(0.01, self.bit_probability_table)
-			self.population.append(r['a'])
-			self.population.append(r['b'])
-
-		self.get_best()
-		# Get rid of half of the population
-		self.population = self.population[0:self.number_of_individuals]
-		self.num_iterations += 1
-		assert (len(self.population) == self.number_of_individuals)
 		
 	def RouletteSelection(self, amount):
 		self.calc_fitness()
@@ -144,7 +112,7 @@ class MiPlusLambdaStrategy(Generation, object):
 		self.mi = mi
 		self.lambd = lambd
 
-		self.max_iterations = 30
+		self.max_iterations = MAX_ITERATIONS
 		self.calc_fitness()
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
@@ -153,7 +121,6 @@ class MiPlusLambdaStrategy(Generation, object):
 	def step(self):
 
 		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "najlepszy:", self.get_best().get_fitness()
-
 		self.num_iterations += 1
 
 		parents = self.RouletteSelection(self.lambd)
@@ -161,20 +128,30 @@ class MiPlusLambdaStrategy(Generation, object):
 		#make children
 		list_of_indices = list(range(self.number_of_individuals))
 		children = []
+		first = -2
+		second = -1
+		
 		for pair in range(int(self.number_of_individuals / 2)):
-			first = random.randint(0, len(list_of_indices) - 1)
-			del list_of_indices[first]
-			second = random.randint(0, len(list_of_indices) - 1)
-			del list_of_indices[second]
+			first += 2
+			second += 2
 			first_parent = parents[first]
 			second_parent = parents[second]
-			index = random.randint(0, NUMBER_OF_CARDS-1)
 		
-			child = first_parent.crossover(second_parent,self.crossover_method)
-			child['a'].mutate(index)
-			child['b'].mutate(index)
-			first_parent.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
-			second_parent.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
+			child={}
+			if random.uniform(0,1) < CROSSOVER_PROBABILITY:
+				child = first_parent.crossover(second_parent,self.crossover_method)
+			else:
+				child['a'] = first_parent
+				child['b'] = second_parent
+				
+			if random.uniform(0,1) < MUTATION_PROBABILITY:
+				child['a'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+			
+
+			if random.uniform(0,1) < MUTATION_PROBABILITY:
+				child['b'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+				
+			
 			child['a'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 			child['b'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 
@@ -189,7 +166,73 @@ class MiPlusLambdaStrategy(Generation, object):
 
 		self.sort()
 		self.population = self.population[0:self.number_of_individuals]
+
+
+class MiLambdaStrategy(Generation, object):
+
+	def __init__(self, mi, lambd, selection_method, crossover_method):
+		if mi > lambd:
+			raise RuntimeError('Bad argument! mi cannot be greater than lambda!')
+		super(MiLambdaStrategy, self).__init__(mi)
+		self.mi = mi
+		self.lambd = lambd
+
+		self.max_iterations = MAX_ITERATIONS
+		self.calc_fitness()
+		self.selection_method = selection_method
+		self.crossover_method = crossover_method
+
+
+	def step(self):
+
+		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "najlepszy:", self.get_best().get_fitness()
+		self.num_iterations += 1
+
+		parents = self.RouletteSelection(self.lambd)
 		
+		#make children
+		list_of_indices = list(range(self.number_of_individuals))
+		children = []
+		first = -2
+		second = -1
+		
+		for pair in range(int(self.number_of_individuals / 2)):
+			first += 2
+			second += 2
+			first_parent = parents[first]
+			second_parent = parents[second]
+		
+			child={}
+			if random.uniform(0,1) < CROSSOVER_PROBABILITY:
+				child = first_parent.crossover(second_parent,self.crossover_method)
+			else:
+				child['a'] = first_parent
+				child['b'] = second_parent
+				
+			if random.uniform(0,1) < MUTATION_PROBABILITY:
+				child['a'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+			
+
+			if random.uniform(0,1) < MUTATION_PROBABILITY:
+				child['b'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+				
+			
+			child['a'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
+			child['b'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
+
+			children.append(child['a'])
+			children.append(child['b'])
+			
+		
+		self.population = []
+		#add children to population
+		for x in children:
+			self.population.append(x)
+
+		self.sort()
+		self.population = self.population[0:self.number_of_individuals]		
+
+	
 
 def main(argv):
 	g = OnePlusOneStrategy()
@@ -204,9 +247,25 @@ def main(argv):
 
 	
 	print "\nmi plus lambda Strategy:\nBest before:\n" 
-	h = MiPlusLambdaStrategy(4, 6, "RouletteSelection","single-point")
+	h = MiPlusLambdaStrategy(12, 50, "RouletteSelection","single-point")
 	while h.get_best().fitness == 0:
-		h = MiPlusLambdaStrategy(4, 6, "RouletteSelection","single-point")
+		h = MiPlusLambdaStrategy(12, 50, "RouletteSelection","single-point")
+
+	#print h.get_best()
+	while h.num_iterations < h.max_iterations:
+
+		if h.get_best().fitness == 0:
+			break
+		h.step()
+
+	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
+	
+	
+	
+	print "\nmi lambda Strategy:\nBest before:\n" 
+	h = MiLambdaStrategy(25, 50, "RouletteSelection","single-point")
+	while h.get_best().fitness == 0:
+		h = MiLambdaStrategy(25, 50, "RouletteSelection","single-point")
 
 	#print h.get_best()
 	while h.num_iterations < h.max_iterations:
