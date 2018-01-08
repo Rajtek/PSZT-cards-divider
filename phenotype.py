@@ -90,8 +90,8 @@ class Phenotype:
 					children_a.append(other.genotype[x])
 	
 			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
-		elif method == "two-piont":
-			position = sorted(random.sample( range( 1, len( self.genotype ) -2 ), 2)))
+		elif method == "two-point":
+			position = sorted(random.sample( range( 1, len( self.genotype ) -2 ), 2))
 			children_a = []
 			children_b = []
 			for x in range( len( self.genotype ) ):
@@ -105,7 +105,7 @@ class Phenotype:
 					children_a.append(self.genotype[x])
 					children_b.append(other.genotype[x])
 			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
-		elif == "uniform":
+		elif method == "uniform":
 			for x in range( len( self.genotype ) ):
 				rand = random.randint(0, 1)
 				if rand == 0:
