@@ -6,9 +6,12 @@ Dla n kard o wartościach od 1 do n potrzebujemy n bitów.
 0 w prawej
 
 ## TODO
-* (1+1)
-* (μ+λ)
-* klasyczny algorytm?
-* różne strategie do obu algorytmów
-* sposób testowania
+* (v)	(1+1)
+* 	(1+1) zrównoleglony
+* 	(μ+λ)
+* 	(μ,λ)
+* 	klasyczny algorytm?
+* 	różne strategie do obu algorytmów
+* (v) 	różne sposoby krzyżowania 
+* 	sposób testowania
 * ...
