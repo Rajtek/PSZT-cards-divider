@@ -64,27 +64,6 @@ class Phenotype:
 	def __repr__(self):
 		return self.__str__()
 
-	def set_bit(self, index, bit):
-		self.genotype[index] = bit % 2
-
-	def get_bit(self, index):
-		return self.genotype[index]
-
-	def get_genotype(self):
-		return self.genotype
-	
-	def get_standard_deviation(self):
-		return self.standard_deviation
-
-	def get_size(self):
-		return len(self.genotype)
-
-	def get_fitness(self):
-		return self.fitness
-
-	def get_influence(self):
-		return self.influence
-
 	def calc_influence(self, s, maximum, i):
 		self.influence = (float(maximum - self.fitness + 1) / float(i * (maximum + 1) - s))
 

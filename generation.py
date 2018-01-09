@@ -5,6 +5,10 @@
 This is the module of generation 
 """
 
+import phenotype
+import random
+import solution
+
 class Generation():
 	"""
 	Class implementing all needed functionality with generation
@@ -13,12 +17,12 @@ class Generation():
 		"""
 		Constructor wich needs number of new generation as a parameter
 		"""
-		self.population = [phenotype.Phenotype(size = NUMBER_OF_CARDS)
+		self.population = [phenotype.Phenotype(size = solution.NUMBER_OF_CARDS)
 								for i in range(number_of_individuals)]
 		self.num_iterations = 0
 		self.number_of_individuals = number_of_individuals
-		self.expected_sum_A = SUM_A
-		self.expected_sum_B = SUM_B
+		self.expected_sum_A = solution.SUM_A
+		self.expected_sum_B = solution.SUM_B
 
 	def __str__(self):
 		s = "\n".join([str(x) for x in self.population])
@@ -35,19 +39,19 @@ class Generation():
 		# Sum all influences and get the biggest one - we will use it
 		# in calc_influence
 		for agent in self.population:
-			s += agent.get_fitness()
-			if m < agent.get_fitness():
-				m = agent.get_fitness()
+			s += agent.fitness
+			if m < agent.fitness:
+				m = agent.fitness
 
 		for x in self.population:
 			x.calc_influence(s, m, self.number_of_individuals)
 
-		self.population.sort(key=lambda x: x.get_influence(), reverse=True)
+		self.population.sort(key=lambda x: x.influence, reverse=True)
 
 	def sort(self):
 		for individual in self.population:
 			individual.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
-		self.population.sort(key=lambda x: x.get_fitness(), reverse=False)
+		self.population.sort(key=lambda x: x.fitness, reverse=False)
 
 	def get_best(self):
 		self.sort()
@@ -61,7 +65,7 @@ class Generation():
 		fitness_sum = 0.0
 		for individual in self.population:
 			individual.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
-			fitness_sum += individual.get_fitness()
+			fitness_sum += individual.fitness
 
 		return float(fitness_sum) / float(self.number_of_individuals)
 
@@ -76,26 +80,77 @@ class Generation():
 		
 			pick = random.uniform(0, 1)
 			for agent in self.population:
-				pick -= agent.get_influence()
+				pick -= agent.influence
 
 				if pick < 0:
 					chosen.append(agent)
 					break
 		return chosen
+	
+	def TournamentSelection(self, amount):
+		self.calc_fitness()
+		chosen = []
+		
+		for i in range(amount):
+			
+			first_rival  = self.population[random.randint(0, self.number_of_individuals -1)]
+			second_rival = self.population[random.randint(0, self.number_of_individuals -1)]
+			
+			if first_rival.fitness > second_rival.fitness:
+				chosen.append(first_rival)
+			else:
+				chosen.append(second_rival)
+				
+		
+		return chosen
+		
+	def RankingSelection(self, amount):
+		self.calc_fitness()
+		chosen = []
+		
+		self.sort()
+		a = (-1.0/self.number_of_individuals)
+		probability = range(0,self.number_of_individuals)
+		probability = [ i*a+6 for i in probability]
+		s = sum(probability)
+		probability = [i/s for i in probability]
+		for i in range(amount):
+			p = random.uniform(0, 1)
+			for index in range(0,len(probability)):
+				p -= probability[index]
+
+				if p < 0:
+					chosen.append(self.population[index])
+					break
+
+		return chosen
+		
+	def Selection(self, selection_method="RouletteSelection" ):
+		if selection_method == "RouletteSelection":
+			return self.RouletteSelection(self.lambd)
+			
+		elif selection_method == "TournamentSelection":
+			return self.TournamentSelection(self.lambd)
+			
+		elif selection_method == "RankingSelectiom":
+			return self.RankingSelection(self.lambd)
+			
+		else: return None
+		
 		
 	
 class OnePlusOneStrategy(Generation, object):
 
 	def __init__(self):
 		super(OnePlusOneStrategy, self).__init__(1)
-		self.max_iterations = MAX_ITERATIONS
+		self.max_iterations = solution.MAX_ITERATIONS
 		self.calc_fitness()
 		
 
 	def step(self):
 		self.num_iterations += 1
-		y = phenotype.Phenotype(size=NUMBER_OF_CARDS, genotype=self.population[0].get_genotype()[:])
-		index = random.randint(0, NUMBER_OF_CARDS-1)
+		y = phenotype.Phenotype(size=solution.NUMBER_OF_CARDS, genotype=self.population[0].genotype[:])
+		index = random.randint(0, solution.NUMBER_OF_CARDS-1)
 		y.mutate(index)
 		y.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 		if y.fitness < self.population[0].fitness:
@@ -112,7 +167,7 @@ class MiPlusLambdaStrategy(Generation, object):
 		self.mi = mi
 		self.lambd = lambd
 
-		self.max_iterations = MAX_ITERATIONS
+		self.max_iterations = solution.MAX_ITERATIONS
 		self.calc_fitness()
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
@@ -120,10 +175,11 @@ class MiPlusLambdaStrategy(Generation, object):
 
 	def step(self):
 
-		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "najlepszy:", self.get_best().get_fitness()
+		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "Best:", self.get_best().fitness
 		self.num_iterations += 1
-
-		parents = self.RouletteSelection(self.lambd)
+		parents = []
+		
+		parents = self.Selection(self.selection_method)
 		
 		#make children
 		list_of_indices = list(range(self.number_of_individuals))
@@ -138,18 +194,18 @@ class MiPlusLambdaStrategy(Generation, object):
 			second_parent = parents[second]
 		
 			child={}
-			if random.uniform(0,1) < CROSSOVER_PROBABILITY:
+			if random.uniform(0,1) < solution.CROSSOVER_PROBABILITY:
 				child = first_parent.crossover(second_parent,self.crossover_method)
 			else:
 				child['a'] = first_parent
 				child['b'] = second_parent
 				
-			if random.uniform(0,1) < MUTATION_PROBABILITY:
-				child['a'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
+				child['a'].mutate(random.randint(0, self.number_of_individuals-1))
 			
 
-			if random.uniform(0,1) < MUTATION_PROBABILITY:
-				child['b'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
+				child['b'].mutate(random.randint(0, self.number_of_individuals-1))
 				
 			
 			child['a'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
@@ -166,7 +222,7 @@ class MiPlusLambdaStrategy(Generation, object):
 
 		self.sort()
 		self.population = self.population[0:self.number_of_individuals]
-
+		
 
 class MiLambdaStrategy(Generation, object):
 
@@ -177,7 +233,7 @@ class MiLambdaStrategy(Generation, object):
 		self.mi = mi
 		self.lambd = lambd
 
-		self.max_iterations = MAX_ITERATIONS
+		self.max_iterations = solution.MAX_ITERATIONS
 		self.calc_fitness()
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
@@ -185,10 +241,10 @@ class MiLambdaStrategy(Generation, object):
 
 	def step(self):
 
-		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "najlepszy:", self.get_best().get_fitness()
+		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "Best:", self.get_best().fitness
 		self.num_iterations += 1
 
-		parents = self.RouletteSelection(self.lambd)
+		parents = self.Selection(self.selection_method)
 		
 		#make children
 		list_of_indices = list(range(self.number_of_individuals))
@@ -203,19 +259,19 @@ class MiLambdaStrategy(Generation, object):
 			second_parent = parents[second]
 		
 			child={}
-			if random.uniform(0,1) < CROSSOVER_PROBABILITY:
+			if random.uniform(0,1) < solution.CROSSOVER_PROBABILITY:
 				child = first_parent.crossover(second_parent,
 												self.crossover_method)
 			else:
 				child['a'] = first_parent
 				child['b'] = second_parent
 				
-			if random.uniform(0,1) < MUTATION_PROBABILITY:
-				child['a'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
+				child['a'].mutate(random.randint(0, self.number_of_individuals-1))
 			
 
-			if random.uniform(0,1) < MUTATION_PROBABILITY:
-				child['b'].mutate(random.randint(0, NUMBER_OF_CARDS-1))
+			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
+				child['b'].mutate(random.randint(0, self.number_of_individuals-1))
 				
 			
 			child['a'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
@@ -231,4 +287,6 @@ class MiLambdaStrategy(Generation, object):
 			self.population.append(x)
 
 		self.sort()
-		self.population = self.population[0:self.number_of_individuals]		
+		self.population = self.population[0:self.number_of_individuals]
+		
+
