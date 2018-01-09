@@ -6,12 +6,14 @@ Dla n kard o wartościach od 1 do n potrzebujemy n bitów.
 0 w prawej
 
 ## TODO
-* (1+1) - zrobiony
+* (1+1) ✓
 * (1+1) zrównoleglony
-* (μ+λ) - zrobiony
-* (μ,λ) - zrobiony
-* klasyczny algorytm?
+* (μ+λ) ✓
+* (μ,λ) ✓
+* programowanie ewolucyjne
 * różne strategie do obu algorytmów
+* strategia elitarna
 * różne sposoby krzyżowania - zrobione
 * sposób testowania
+* dokumentacja
 * ...
