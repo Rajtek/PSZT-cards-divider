@@ -14,7 +14,7 @@ Dla n kard o wartościach od 1 do n potrzebujemy n bitów.
 * ...
 
 
-##Zrobione
+## Zrobione
 * (1+1) ✓
 * (μ+λ) ✓
 * (μ,λ) ✓
