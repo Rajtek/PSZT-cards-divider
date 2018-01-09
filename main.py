@@ -7,7 +7,7 @@ sposób na podział kart na dwie kupki w taki sposób, że suma kart na pierwsze
 najbliższa wartości A, a suma kart na drugiej kupce jest jak najbliższa wartości B.
 '''
 
-__author__ = "Rafał Koguciuk adn Bartosz Rajkowski and Piotr Frysz"
+__author__ = "Rafał Koguciuk and Bartosz Rajkowski and Piotr Frysz"
 __version__ = "1.0.0"
 __maintainer__ = "Tomasz Trzciński"
 
