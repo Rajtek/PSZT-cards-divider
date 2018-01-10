@@ -17,8 +17,8 @@ import phenotype
 import generation
 import math
 
-NUMBER_OF_CARDS = 50
-SUM_A = 243
+NUMBER_OF_CARDS = 100
+SUM_A = 4027
 SUM_B = 1032
 CROSSOVER_PROBABILITY = 0.8
 MUTATION_PROBABILITY = 0.04
@@ -28,16 +28,23 @@ LAMBDA=30
 
 
 def find_solution():
-	
 	g = generation.OnePlusOneStrategy()
 	print "1 + 1 Strategy:\nBefore:"
 	print g
 	while g.num_iterations < g.max_iterations:
-
 		if g.population[0].fitness == 0:
 			break
 		g.step()
 	print "After:",g.num_iterations, "iterations:\n",g
+	
+	g = generation.OnePlusOneParalleledStrategy(MI)
+	print "1 + 1 Paralleled Strategy:\n Best before:"
+	print g.get_best()
+	while g.num_iterations < g.max_iterations:
+		if g.get_best().fitness == 0:
+			break
+		g.step()
+	print "After:",g.num_iterations, "iterations:\n",g.get_best()
 
 	
 	print "\nmi plus lambda Strategy Roulette:\nBest before:\n" 
@@ -84,9 +91,23 @@ def find_solution():
 		h.step()
 
 	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
+	
+	
+	
+	print "\nEvolutionary programming Strategy Ranking:\nBest before:\n" 
+	h = generation.EvolutionaryProgrammingStrategy(MI)	
+	while h.get_best().fitness == 0:
+		h = generation.EvolutionaryProgrammingStrategy(MI)
 
+	print h.get_best()
+	while h.num_iterations < h.max_iterations:
 
+		if h.get_best().fitness == 0:
+			break
+		h.step()
 
+	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
+	
 def main(argv):
 	
 	# find solution

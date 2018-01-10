@@ -23,6 +23,7 @@ class Generation():
 		self.number_of_individuals = number_of_individuals
 		self.expected_sum_A = solution.SUM_A
 		self.expected_sum_B = solution.SUM_B
+		self.max_iterations = solution.MAX_ITERATIONS
 
 	def __str__(self):
 		s = "\n".join([str(x) for x in self.population])
@@ -143,7 +144,6 @@ class OnePlusOneStrategy(Generation, object):
 
 	def __init__(self):
 		super(OnePlusOneStrategy, self).__init__(1)
-		self.max_iterations = solution.MAX_ITERATIONS
 		self.calc_fitness()
 		
 
@@ -156,6 +156,50 @@ class OnePlusOneStrategy(Generation, object):
 		if y.fitness < self.population[0].fitness:
 			self.population[0].genotype = y.genotype
 			self.population[0].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
+			
+			
+class OnePlusOneParalleledStrategy(Generation, object):
+	def __init__(self, number_of_threads):
+		super(OnePlusOneParalleledStrategy, self).__init__(number_of_threads)
+		phen = phenotype.Phenotype(size = solution.NUMBER_OF_CARDS)
+		for index in range(0,len(self.population)):
+			self.population[index] = phen
+		self.calc_fitness()
+		self.best = self.population[0]
+		
+	def step(self):
+		self.num_iterations += 1
+		
+		for i in range(0, self.number_of_individuals-1):
+			y = phenotype.Phenotype(size=solution.NUMBER_OF_CARDS, genotype=self.population[i].genotype[:])
+			index = random.randint(0, solution.NUMBER_OF_CARDS-1)
+			y.mutate(index)
+			y.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
+			if y.fitness < self.best.fitness:
+				self.best = y
+		
+		for index in range(0, self.number_of_individuals):
+			self.population[index] = self.best
+		self.calc_fitness()
+
+class EvolutionaryProgrammingStrategy(Generation, object):
+	def __init__(self, mi):
+		super(EvolutionaryProgrammingStrategy, self).__init__(mi)
+		self.calc_fitness()
+		
+	def step(self):
+		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "Best:", self.get_best().fitness
+		self.num_iterations += 1
+		
+		for index in range(0, self.number_of_individuals):
+			child = (phenotype.Phenotype(size=solution.NUMBER_OF_CARDS, genotype=self.population[index].genotype[:]))
+			child.mutate(random.randint(0, solution.NUMBER_OF_CARDS-1))
+			child.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
+			
+			self.population.append(child)
+		
+		self.sort()
+		self.population = self.RankingSelection(self.number_of_individuals)		
 
 
 class MiPlusLambdaStrategy(Generation, object):
@@ -167,7 +211,6 @@ class MiPlusLambdaStrategy(Generation, object):
 		self.mi = mi
 		self.lambd = lambd
 
-		self.max_iterations = solution.MAX_ITERATIONS
 		self.calc_fitness()
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
@@ -201,11 +244,11 @@ class MiPlusLambdaStrategy(Generation, object):
 				child['b'] = second_parent
 				
 			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
-				child['a'].mutate(random.randint(0, self.number_of_individuals-1))
+				child['a'].mutate(random.randint(0, solution.NUMBER_OF_CARDS-1))
 			
 
 			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
-				child['b'].mutate(random.randint(0, self.number_of_individuals-1))
+				child['b'].mutate(random.randint(0, solution.NUMBER_OF_CARDS-1))
 				
 			
 			child['a'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
@@ -233,7 +276,7 @@ class MiLambdaStrategy(Generation, object):
 		self.mi = mi
 		self.lambd = lambd
 
-		self.max_iterations = solution.MAX_ITERATIONS
+		
 		self.calc_fitness()
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
@@ -267,11 +310,11 @@ class MiLambdaStrategy(Generation, object):
 				child['b'] = second_parent
 				
 			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
-				child['a'].mutate(random.randint(0, self.number_of_individuals-1))
+				child['a'].mutate(random.randint(0, solution.NUMBER_OF_CARDS-1))
 			
 
 			if random.uniform(0,1) < solution.MUTATION_PROBABILITY:
-				child['b'].mutate(random.randint(0, self.number_of_individuals-1))
+				child['b'].mutate(random.randint(0, solution.NUMBER_OF_CARDS-1))
 				
 			
 			child['a'].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
