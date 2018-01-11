@@ -1,24 +1,10 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-"""
-This is the module of phenotype representing cards
-"""
-
-
 import random
 
-
 class Phenotype:
-	"""
-	Class implementing all needed functionality with phenotype
-	"""
-	
 	def __init__(self, **kwargs):
-		"""
-		Constructor wich needs as a parameter 
-		genotype or size of new phenotype
-		"""
 		if "genotype" in kwargs.keys():
 			if type(kwargs["genotype"]) != list:
 				raise RuntimeError('Bad argument "genotype". Must be list')
@@ -38,10 +24,12 @@ class Phenotype:
 		self.fitness = 0.0
 		self.influence = 0.0
 
+
 	def __str__(self):
-		st = "\n===Genotype===\n"
+		st = "===Genotype===\n"
 		s = "".join([str(x) for x in self.genotype])
-        	s = (st + "Genotype: " + s + " Fitness: " + str(self.fitness) + " Influence: " + str(self.influence))
+		s = (st + "Genotype: " + s + " Fitness: " + str(self.fitness) +
+             " Influence: " + str(self.influence))
 		self.group_a = []
 		self.sum_a = 0
 		self.group_b = []
@@ -54,21 +42,25 @@ class Phenotype:
  				self.group_b.append(position + 1)
 				self.sum_b += position + 1
 		s += "\n"
-		s += "Group 1: " + str(self.group_a)
-		s += " Sum_a: " + str(self.sum_a) + "\n"
-		s += "Group 2: " + str(self.group_b)
-		s += " Sum_b: " + str(self.sum_b) + "\n"
+		#s += "Group 1: " + str(self.group_a)
+		#s += " Sum_a: " + str(self.sum_a) + "\n"
+		#s += "Group 2: " + str(self.group_b)
+		#s += " Sum_b: " + str(self.sum_b) + "\n"
 		s += "========================="
 		return s
+
 
 	def __repr__(self):
 		return self.__str__()
 
+
 	def calc_influence(self, s, maximum, i):
 		self.influence = (float(maximum - self.fitness + 1) / float(i * (maximum + 1) - s))
 
+
 	def mutate(self, index):
 		self.genotype[index] ^= 1
+
 
 	def crossover(self, other, method="single-point"):
 
@@ -114,6 +106,8 @@ class Phenotype:
 			return {'a': Phenotype(genotype=children_a),'b': Phenotype(genotype=children_b)}
 		else:
 			return None
+			
+			
 	def calc_fitness_function(self, A, B):
 		s = 0
 		i = 0

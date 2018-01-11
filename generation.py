@@ -1,23 +1,17 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-"""
-This is the module of generation 
-"""
-
 import phenotype
 import random
 import solution
 
 class Generation():
-	"""
-	Class implementing all needed functionality with generation
-	"""
-	def __init__(self, number_of_individuals):
-		"""
-		Constructor wich needs number of new generation as a parameter
-		"""
-		self.population = [phenotype.Phenotype(size = solution.NUMBER_OF_CARDS)
+	def __init__(self, number_of_individuals, gen=[0]):
+		if gen == [0]:
+			self.population = [phenotype.Phenotype(size = solution.NUMBER_OF_CARDS)
+								for i in range(number_of_individuals)]
+		else:
+			self.population = [phenotype.Phenotype(genotype=gen)
 								for i in range(number_of_individuals)]
 		self.num_iterations = 0
 		self.number_of_individuals = number_of_individuals
@@ -25,10 +19,12 @@ class Generation():
 		self.expected_sum_B = solution.SUM_B
 		self.max_iterations = solution.MAX_ITERATIONS
 
+
 	def __str__(self):
 		s = "\n".join([str(x) for x in self.population])
 		s = "\n************Population: **************" + s + "\n"
 		return s
+
 
 	def calc_fitness(self):
 		for individual in self.population:
@@ -49,18 +45,17 @@ class Generation():
 
 		self.population.sort(key=lambda x: x.influence, reverse=True)
 
+
 	def sort(self):
 		for individual in self.population:
 			individual.calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
 		self.population.sort(key=lambda x: x.fitness, reverse=False)
 
+
 	def get_best(self):
 		self.sort()
 		return self.population[0]
 
-	def get_worst(self):
-		self.sort()
-		return self.population[-1]
 
 	def get_avg_fitness(self):
 		fitness_sum = 0.0
@@ -78,7 +73,6 @@ class Generation():
 		
 		for i in range(amount):
 		# roll dice
-		
 			pick = random.uniform(0, 1)
 			for agent in self.population:
 				pick -= agent.influence
@@ -88,6 +82,7 @@ class Generation():
 					break
 		return chosen
 	
+	
 	def TournamentSelection(self, amount):
 		self.calc_fitness()
 		chosen = []
@@ -96,13 +91,20 @@ class Generation():
 			
 			first_rival  = self.population[random.randint(0, self.number_of_individuals -1)]
 			second_rival = self.population[random.randint(0, self.number_of_individuals -1)]
+			third_rival  = self.population[random.randint(0, self.number_of_individuals -1)]
+
 			
 			if first_rival.fitness > second_rival.fitness:
-				chosen.append(first_rival)
+				if third_rival.fitness > first_rival.fitness:
+					chosen.append(third_rival)
+				else:
+					chosen.append(first_rival)
 			else:
-				chosen.append(second_rival)
+				if third_rival.fitness > second_rival.fitness:
+					chosen.append(third_rival)
+				else:
+					chosen.append(second_rival)
 				
-		
 		return chosen
 		
 	def RankingSelection(self, amount):
@@ -133,7 +135,7 @@ class Generation():
 		elif selection_method == "TournamentSelection":
 			return self.TournamentSelection(self.lambd)
 			
-		elif selection_method == "RankingSelectiom":
+		elif selection_method == "RankingSelection":
 			return self.RankingSelection(self.lambd)
 			
 		else: return None
@@ -142,10 +144,9 @@ class Generation():
 	
 class OnePlusOneStrategy(Generation, object):
 
-	def __init__(self):
-		super(OnePlusOneStrategy, self).__init__(1)
-		self.calc_fitness()
-		
+	def __init__(self, genotype=[0]):
+		super(OnePlusOneStrategy, self).__init__(1, genotype)
+		self.calc_fitness()		
 
 	def step(self):
 		self.num_iterations += 1
@@ -156,12 +157,16 @@ class OnePlusOneStrategy(Generation, object):
 		if y.fitness < self.population[0].fitness:
 			self.population[0].genotype = y.genotype
 			self.population[0].calc_fitness_function(self.expected_sum_A, self.expected_sum_B)
-			
+		
+		return self.population[0].fitness
 			
 class OnePlusOneParalleledStrategy(Generation, object):
-	def __init__(self, number_of_threads):
-		super(OnePlusOneParalleledStrategy, self).__init__(number_of_threads)
-		phen = phenotype.Phenotype(size = solution.NUMBER_OF_CARDS)
+	def __init__(self, number_of_threads, genotyp=[0]):
+		super(OnePlusOneParalleledStrategy, self).__init__(number_of_threads, genotyp)
+		if genotyp == [0]:
+			phen = phenotype.Phenotype(size = solution.NUMBER_OF_CARDS)
+		else:
+			phen = phenotype.Phenotype(genotype = genotyp)
 		for index in range(0,len(self.population)):
 			self.population[index] = phen
 		self.calc_fitness()
@@ -181,6 +186,9 @@ class OnePlusOneParalleledStrategy(Generation, object):
 		for index in range(0, self.number_of_individuals):
 			self.population[index] = self.best
 		self.calc_fitness()
+		
+		return self.best.fitness
+
 
 class EvolutionaryProgrammingStrategy(Generation, object):
 	def __init__(self, mi):
@@ -188,7 +196,6 @@ class EvolutionaryProgrammingStrategy(Generation, object):
 		self.calc_fitness()
 		
 	def step(self):
-		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "Best:", self.get_best().fitness
 		self.num_iterations += 1
 		
 		for index in range(0, self.number_of_individuals):
@@ -200,6 +207,8 @@ class EvolutionaryProgrammingStrategy(Generation, object):
 		
 		self.sort()
 		self.population = self.RankingSelection(self.number_of_individuals)		
+		
+		return self.population[0].fitness
 
 
 class MiPlusLambdaStrategy(Generation, object):
@@ -217,8 +226,6 @@ class MiPlusLambdaStrategy(Generation, object):
 
 
 	def step(self):
-
-		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "Best:", self.get_best().fitness
 		self.num_iterations += 1
 		parents = []
 		
@@ -266,6 +273,8 @@ class MiPlusLambdaStrategy(Generation, object):
 		self.sort()
 		self.population = self.population[0:self.number_of_individuals]
 		
+		return self.population[0].fitness
+		
 
 class MiLambdaStrategy(Generation, object):
 
@@ -281,10 +290,7 @@ class MiLambdaStrategy(Generation, object):
 		self.selection_method = selection_method
 		self.crossover_method = crossover_method
 
-
 	def step(self):
-
-		print self.num_iterations , ": average fitness" , self.get_avg_fitness(), "Best:", self.get_best().fitness
 		self.num_iterations += 1
 
 		parents = self.Selection(self.selection_method)
@@ -332,4 +338,4 @@ class MiLambdaStrategy(Generation, object):
 		self.sort()
 		self.population = self.population[0:self.number_of_individuals]
 		
-
+		return self.population[0].fitness

@@ -17,101 +17,122 @@ import phenotype
 import generation
 import math
 
-NUMBER_OF_CARDS = 20
-SUM_A = 60
-SUM_B = 150
+NUMBER_OF_CARDS = 10
+SUM_A = 15
+SUM_B = 40
 CROSSOVER_PROBABILITY = 0.8
 MUTATION_PROBABILITY = 0.04
 MAX_ITERATIONS = 50
-MI=15
-LAMBDA=30
+MI=8
+LAMBDA=16
+MIN = 35
 
-
-def find_solution():
-	g = generation.OnePlusOneStrategy()
-	print "1 + 1 Strategy:\nBefore:"
-	print g
-	while g.num_iterations < g.max_iterations:
-		if g.population[0].fitness == 0:
-			break
-		g.step()
-	print "After:",g.num_iterations, "iterations:\n",g
+def find_solution(argv):
+	while True:
+		genotype = phenotype.Phenotype(size = NUMBER_OF_CARDS)
+		genotype.calc_fitness_function(SUM_A, SUM_B)
+		if genotype.fitness > MIN:
+			break;
+	if len(argv) == 0:
+		print "First  parameter like: 1Plus1 or 1Plus1Paralleled or EvolutionaryProgramming or MiPlusLambda or MiLambda!"
+		return 
+	if  argv[0]!= "1Plus1"   and argv[0]!="1Plus1Paralleled" and argv[0]!="EvolutionaryProgramming" and argv[0]!= "MiPlusLambda" and	argv[0]!= "MiLambda":
+		print "First  parameter like: 1Plus1 or 1Plus1Paralleled or EvolutionaryProgramming or MiPlusLambda or MiLambda!"
 	
-	g = generation.OnePlusOneParalleledStrategy(MI)
-	print "1 + 1 Paralleled Strategy:\n Best before:"
-	print g.get_best()
-	while g.num_iterations < g.max_iterations:
-		if g.get_best().fitness == 0:
-			break
-		g.step()
-	print "After:",g.num_iterations, "iterations:\n",g.get_best()
-
+	if argv[0]=="MiPlusLambda" or argv[0]== "MiLambda":
+		if len(argv) == 1:
+			print "Second parameter like: RouletteSelection or TournamentSelection or RankingSelection!"
+			return
+		if argv[1]== "RouletteSelection" or argv[1]== "TournamentSelection" or argv[1]== "RankingSelection":
+			if len(argv) == 2:
+				argv.append("single-point")
+			if argv[2] != "single-point" and argv[2]!= "two-point" and argv[2]!= "uniform":
+				print "Third parameter like: single-point or two-point or uniform!"
+				return
+		else:
+			print "Second parameter like: RouletteSelection or TournamentSelection or RankingSelection!"
+			return
+				
+			
+			
+	if argv[0] == "1Plus1":
+		h = generation.OnePlusOneStrategy(genotype.genotype)	
+		#print "\n",argv[0],"strategy:\nBest before:", h.get_best().fitness
+		print h.get_best().fitness
+		print h.get_avg_fitness()
+		while h.num_iterations < h.max_iterations:
+			h.step()
+			print h.get_best().fitness
+			print h.get_avg_fitness()
+			if h.population[0].fitness == 0:
+				break
+		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 	
-	print "\nmi plus lambda Strategy Roulette:\nBest before:\n" 
-	h = generation.MiPlusLambdaStrategy(MI, LAMBDA, "RouletteSelection","single-point")
-	while h.get_best().fitness == 0:
-		h = generation.MiPlusLambdaStrategy(MI, LAMBDA, "RouletteSelection","single-point")
+	if argv[0] == "1Plus1Paralleled":
+		h = generation.OnePlusOneParalleledStrategy(MI,genotype.genotype)
+		#print "\n",argv[0], "strategy:\nBest before:", h.get_best().fitness
+		print h.get_best().fitness
+		print h.get_avg_fitness()
+		while h.num_iterations < h.max_iterations:
+			h.step()
+			print h.get_best().fitness
+			print h.get_avg_fitness()
+			if h.population[0].fitness == 0:
+				break
+		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
+	
+	if argv[0] == "MiPlusLambda":
+		h = generation.MiPlusLambdaStrategy(MI, LAMBDA, argv[1],argv[2])
+		while h.get_best().fitness < MIN + 1:
+			h = generation.MiPlusLambdaStrategy(MI, LAMBDA, argv[1],argv[2])
+		#print "\n", argv[0], argv[1], argv[2], "\nBest before:", h.get_best().fitness
+		print h.get_best().fitness
+		print h.get_avg_fitness()
+		while h.num_iterations < h.max_iterations:
+			h.step()
+			print h.get_best().fitness
+			print h.get_avg_fitness()
+			if h.population[0].fitness == 0:
+				break
+		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
+	
 
-	print h.get_best()
-	while h.num_iterations < h.max_iterations:
-
-		if h.get_best().fitness == 0:
-			break
-		h.step()
-
-	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
+	if argv[0] == "MiLambda":
+		h = generation.MiLambdaStrategy(MI, LAMBDA, argv[1],argv[2])
+		while h.get_best().fitness < MIN + 1:
+			h = generation.MiLambdaStrategy(MI, LAMBDA, argv[1],argv[2])
+		#print "\n", argv[0], "strategy",argv[1], argv[2], "\nBest before:", h.get_best().fitness
+		print h.get_best().fitness
+		print h.get_avg_fitness()
+		while h.num_iterations < h.max_iterations:
+			h.step()
+			print h.get_best().fitness
+			print h.get_avg_fitness()
+			if h.population[0].fitness == 0:
+				break
+		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 	
 	
-	
-	print "\nmi plus lambda Strategy Tournament:\nBest before:\n" 
-	h = generation.MiPlusLambdaStrategy(MI, LAMBDA, "TournamentSelection","single-point")
-	while h.get_best().fitness == 0:
-		h = generation.MiPlusLambdaStrategy(MI, LAMBDA, "TournamentSelection","single-point")
+	if argv[0] == "EvolutionaryProgramming":
+		h = generation.EvolutionaryProgrammingStrategy(MI)	
+		while h.get_best().fitness < MIN + 1:
+			h = generation.EvolutionaryProgrammingStrategy(MI)
+		#print "\n", argv[0], "strategy", argv[1], argv[2], "\nBest before:", h.get_best().fitness 
+		print h.get_best().fitness
+		print h.get_avg_fitness()
+		while h.num_iterations < h.max_iterations:
+			h.step()
+			print h.get_best().fitness
+			print h.get_avg_fitness()
+			if h.population[0].fitness == 0:
+				break
+		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 
-	print h.get_best()
-	while h.num_iterations < h.max_iterations:
-
-		if h.get_best().fitness == 0:
-			break
-		h.step()
-
-	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
-	
-	
-	print "\nmi plus lambda Strategy Ranking:\nBest before:\n" 
-	h = generation.MiPlusLambdaStrategy(MI, LAMBDA, "RankingSelectiom","single-point")
-	while h.get_best().fitness == 0:
-		h = generation.MiPlusLambdaStrategy(MI, LAMBDA, "RankingSelectiom","single-point")
-
-	print h.get_best()
-	while h.num_iterations < h.max_iterations:
-
-		if h.get_best().fitness == 0:
-			break
-		h.step()
-
-	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
-	
-	
-	
-	print "\nEvolutionary programming Strategy Ranking:\nBest before:\n" 
-	h = generation.EvolutionaryProgrammingStrategy(MI)	
-	while h.get_best().fitness == 0:
-		h = generation.EvolutionaryProgrammingStrategy(MI)
-
-	print h.get_best()
-	while h.num_iterations < h.max_iterations:
-
-		if h.get_best().fitness == 0:
-			break
-		h.step()
-
-	print "\nBest after:",h.num_iterations, "iterations:\n", h.get_best()
-	
+	return
 def main(argv):
 	
 	# find solution
-	find_solution()
+	find_solution(argv)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])

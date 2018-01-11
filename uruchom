@@ -1,0 +1,35 @@
+#!/bin/bash
+if [ $1 != "1Plus1" -a $1 != "1Plus1Paralleled" -a $1 != "MiLambda" -a $1 != "MiPlusLambda" -a $1 != "EvolutionaryProgramming" ]
+then
+	echo "Złe argumenty!"
+	exit 1
+fi
+if [ $2 ]
+then
+	if [ $2 != "RouletteSelection" -a $2 != "TournamentSelection" -a $2 != "RankingSelection" ]
+	then
+		echo "Złe argumenty!"
+		exit 0
+	fi
+	if [ $3 ]
+	then
+		if [ $3 != "single-point" -a $3 != "two-point" -a $3 != "uniform" ]
+		then
+			echo "Złe argumenty!"
+			exit 0
+		fi
+	fi
+fi
+
+case $# in
+	1) nazwa="$1";;
+	2) nazwa="$1"_"$2";;
+	3) nazwa="$1"_"$2"_"$3"
+esac
+
+arg="$1 ""$2 ""$3"
+./solution.py $arg > ./$nazwa'_result.txt'
+python wykres.py $nazwa
+
+rm $nazwa'_result.txt'
+exit 0
