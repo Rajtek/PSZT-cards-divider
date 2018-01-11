@@ -3,8 +3,10 @@
 ## Uruchamianie
 ./uruchum strategia metodaSelekcji metodaKrzyżowania
 
-strategia ∈ { 1Plus1 ; 1Plus1Paralleled ; EvolutionaryProgramming ; MiPlusLambda ; MiLambda } \n
-metodaSelekcji ∈ { RouletteSelection ; TournamentSelection ; RankingSelekction } \n
+strategia ∈ { 1Plus1 ; 1Plus1Paralleled ; EvolutionaryProgramming ; MiPlusLambda ; MiLambda }
+
+metodaSelekcji ∈ { RouletteSelection ; TournamentSelection ; RankingSelekction }
+
 metodaKrzyżowania ∈ { single-point ; two-point ; uniform }
 
 Program uruchamia odpowiedni algorytm, a wyniki zapisuje w postaci wykresu o odpowiedniej dla wywołania nazwie.
