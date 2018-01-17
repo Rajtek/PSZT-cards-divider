@@ -1,5 +1,9 @@
 #!/bin/bash
-if [ $1 != "1Plus1" -a $1 != "1Plus1Paralleled" -a $1 != "MiLambda" -a $1 != "MiPlusLambda" -a $1 != "EvolutionaryProgramming" ]
+if [ ! $1 ]; then
+	echo "Złe argumenty!"
+	exit 1
+fi
+if [ $1 != "1Plus1" ] && [ $1 != "1Plus1Paralleled" ] && [ $1 != "MiLambda" ] && [ $1 != "MiPlusLambda" ] && [ $1 != "EvolutionaryProgramming" ]
 then
 	echo "Złe argumenty!"
 	exit 1
@@ -28,7 +32,7 @@ case $# in
 esac
 
 arg="$1 ""$2 ""$3"
-./solution.py $arg > ./$nazwa'_result.txt'
+time ./solution.py $arg > ./$nazwa'_result.txt'
 python wykres.py $nazwa
 
 rm $nazwa'_result.txt'

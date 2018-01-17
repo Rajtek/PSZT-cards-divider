@@ -17,15 +17,15 @@ import phenotype
 import generation
 import math
 
-NUMBER_OF_CARDS = 10
-SUM_A = 15
-SUM_B = 40
+NUMBER_OF_CARDS = 1000
+SUM_A = 124951
+SUM_B = 375549
 CROSSOVER_PROBABILITY = 0.8
 MUTATION_PROBABILITY = 0.04
-MAX_ITERATIONS = 50
-MI=8
-LAMBDA=16
-MIN = 35
+MAX_ITERATIONS = 1000
+MI=30
+LAMBDA=50
+MIN = 2
 
 def find_solution(argv):
 	while True:
@@ -64,7 +64,7 @@ def find_solution(argv):
 			h.step()
 			print h.get_best().fitness
 			print h.get_avg_fitness()
-			if h.population[0].fitness == 0:
+			if h.population[0].fitness < MIN:
 				break
 		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 	
@@ -77,7 +77,7 @@ def find_solution(argv):
 			h.step()
 			print h.get_best().fitness
 			print h.get_avg_fitness()
-			if h.population[0].fitness == 0:
+			if h.population[0].fitness < MIN:
 				break
 		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 	
@@ -92,7 +92,7 @@ def find_solution(argv):
 			h.step()
 			print h.get_best().fitness
 			print h.get_avg_fitness()
-			if h.population[0].fitness == 0:
+			if h.population[0].fitness < MIN:
 				break
 		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 	
@@ -108,7 +108,7 @@ def find_solution(argv):
 			h.step()
 			print h.get_best().fitness
 			print h.get_avg_fitness()
-			if h.population[0].fitness == 0:
+			if h.population[0].fitness < MIN:
 				break
 		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 	
@@ -124,7 +124,7 @@ def find_solution(argv):
 			h.step()
 			print h.get_best().fitness
 			print h.get_avg_fitness()
-			if h.population[0].fitness == 0:
+			if h.population[0].fitness < MIN:
 				break
 		#print "Best after: ",h.population[0].fitness, ". Iterations:", h.num_iterations, "\n"
 

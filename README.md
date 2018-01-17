@@ -1,7 +1,7 @@
 # PSZT-cards-divider
 
 ## Uruchamianie
-./uruchum strategia metodaSelekcji metodaKrzyżowania
+./uruchom strategia metodaSelekcji metodaKrzyżowania
 
 strategia ∈ { 1Plus1 ; 1Plus1Paralleled ; EvolutionaryProgramming ; MiPlusLambda ; MiLambda }
 
@@ -18,11 +18,8 @@ Dla n kard o wartościach od 1 do n potrzebujemy n bitów.
 0 w prawej
 
 ## TODO
-* strategia elitarna ( chyba nie bedziemy robić )
 * sposób testowania
 * dokumentacja
-* ...
-
 
 ## Zrobione
 * (1+1) ✓

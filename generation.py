@@ -4,6 +4,7 @@
 import phenotype
 import random
 import solution
+import numpy as np
 
 class Generation():
 	def __init__(self, number_of_individuals, gen=[0]):
@@ -86,25 +87,36 @@ class Generation():
 	def TournamentSelection(self, amount):
 		self.calc_fitness()
 		chosen = []
-		
-		for i in range(amount):
+		q=3
+		A = np.array(self.population)
+		B = A[0:(len(A)/q)*q]
+		random.shuffle(B)
+		C = np.reshape(B,(len(A)/q,q))
+		i=0
+		j=0
+		k = C.shape[0]
+		while i < amount:
+			if j == k:
+				random.shuffle(B)
+				C = np.reshape(B,(len(A)/q,q))
+				j = 0
+				
+			first_rival  = C[j][0]
+			second_rival = C[j][1]
+			third_rival  = C[j][2]
 			
-			first_rival  = self.population[random.randint(0, self.number_of_individuals -1)]
-			second_rival = self.population[random.randint(0, self.number_of_individuals -1)]
-			third_rival  = self.population[random.randint(0, self.number_of_individuals -1)]
-
-			
-			if first_rival.fitness > second_rival.fitness:
-				if third_rival.fitness > first_rival.fitness:
+			if first_rival.fitness < second_rival.fitness:
+				if third_rival.fitness < first_rival.fitness:
 					chosen.append(third_rival)
 				else:
 					chosen.append(first_rival)
 			else:
-				if third_rival.fitness > second_rival.fitness:
+				if third_rival.fitness < second_rival.fitness:
 					chosen.append(third_rival)
 				else:
 					chosen.append(second_rival)
-				
+			i += 1
+			j += 1
 		return chosen
 		
 	def RankingSelection(self, amount):
