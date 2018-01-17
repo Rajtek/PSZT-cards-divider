@@ -1,7 +1,7 @@
 import sys
 import matplotlib
 import pylab
-
+"""
 def main(argv):
 
 	plik = open("result_2.txt", "r")
@@ -64,4 +64,4 @@ def main(argv):
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])
-"""
+
