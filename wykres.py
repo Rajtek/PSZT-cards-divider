@@ -1,10 +1,10 @@
 import sys
 import matplotlib
 import pylab
-"""
+
 def main(argv):
 
-	plik = open("result.txt", "r")
+	plik = open("result_2.txt", "r")
 	liczby = []
 	srednia = []
 	a = 0
@@ -25,7 +25,7 @@ def main(argv):
 	pylab.ylabel('Czas dzialania algorytmu')
 	pylab.title('Algorytm zachlanny')
 	pylab.grid(True)
-	pylab.savefig('zachlanny.png')
+	pylab.savefig('zachlanny2.png')
 
 	return
 	
@@ -64,3 +64,4 @@ def main(argv):
 	
 if __name__ == "__main__":
 	main(sys.argv[1:])
+"""
