@@ -1,29 +1,29 @@
-1+1 - 0.47s
-1+1 Paralleled - 4s
+1+1 - 0.47s		680
+1+1 Paralleled - 3.2s	160
 
-MPL Ran 1 37.7
-MPL Ran 2 15.9
-MPL Ran M 32
+MPL Ran 1 16		430
+MPL Ran 2 8		370
+MPL Ran M 2		50
 
-MPL Tou 1 31.6
-MPL Tou 2 31.9
-MPL Tou M 47.4
+MPL Tou 1 16		490
+MPL Tou 2 13		400
+MPL Tou M 6.5		140
 
-MPL Rou 1 39.2
-MPL Rou 2 30.0
-MPL Rou M 60.5
+MPL Rou 1 18		400
+MPL Rou 2 23		370
+MPL Rou M 7		70
 
-ML Ran 1 39.6
-ML Ran 2 39.9
-ML Ran M 56.6
+ML Ran 1 39.6		po 1000 180000
+ML Ran 2 39.9		po 1000 150000
+ML Ran M 56.6		po 1000 140000
 
-ML Tou 1 32.6
-ML Tou 2 19.9
-ML Tou M 57.2
+ML Tou 1 16		500
+ML Tou 2 13		380
+ML Tou M 3		50
 
-ML Rou 1 30.9
-ML Rou 2 37.3
-ML Rou M 54
+ML Rou 1 30.9		530
+ML Rou 2 19		520
+ML Rou M 8		140
 
-EP 15
+EP 15			310
 
