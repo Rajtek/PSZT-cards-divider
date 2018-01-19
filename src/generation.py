@@ -23,7 +23,7 @@ class Generation():
 
 	def __str__(self):
 		s = "\n".join([str(x) for x in self.population])
-		s = "\n************Population: **************" + s + "\n"
+		s = "\n            Population:             " + s + "\n"
 		return s
 
 

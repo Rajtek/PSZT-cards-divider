@@ -26,7 +26,7 @@ class Phenotype:
 
 
 	def __str__(self):
-		st = "===Genotype===\n"
+		st = "   Genotype   \n"
 		s = "".join([str(x) for x in self.genotype])
 		s = (st + "Genotype: " + s + " Fitness: " + str(self.fitness) +
              " Influence: " + str(self.influence))
@@ -42,10 +42,10 @@ class Phenotype:
  				self.group_b.append(position + 1)
 				self.sum_b += position + 1
 		s += "\n"
-		#s += "Group 1: " + str(self.group_a)
-		#s += " Sum_a: " + str(self.sum_a) + "\n"
-		#s += "Group 2: " + str(self.group_b)
-		#s += " Sum_b: " + str(self.sum_b) + "\n"
+		s += "Group 1: " + str(self.group_a)
+		s += " Sum_a: " + str(self.sum_a) + "\n"
+		s += "Group 2: " + str(self.group_b)
+		s += " Sum_b: " + str(self.sum_b) + "\n"
 		s += "========================="
 		return s
 
